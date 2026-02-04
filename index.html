@@ -3,25 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
 <title>Carrusel Fullscreen CTA</title>
 
 <style>
 :root {
   --mint: #5DD3B6;
-  --accent: #D61355;
-  --dark: #211832;
   --bg: #ffffff;
   --shadow: 0 10px 40px rgba(93, 211, 182, 0.18);
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html, body {
   margin: 0;
   padding: 0;
-  width: 100%;
-  overflow: hidden;
   background: var(--bg);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
 }
 
 * {
@@ -29,241 +26,81 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* =========================
-   CONTENEDOR
-========================= */
+/* ===== CONTENEDOR ===== */
 .carousel-wrapper {
   width: 100vw;
   overflow: hidden;
-  position: relative;
 }
 
-/* =========================
-   CARRUSEL
-========================= */
+/* ===== CARRUSEL ===== */
 .carousel {
   display: flex;
   gap: 12px;
   padding: 0 12px;
   touch-action: pan-y;
   will-change: transform;
-  transition: transform 0.3s ease-out;
 }
 
 .slide {
-  min-width: calc(100vw - 24px);
-  height: 100svh;
+  flex: 0 0 calc(100vw - 24px);
+  min-height: 100vh; /* más estable que 100svh */
   background: #fff;
   border-radius: 22px;
   overflow: hidden;
   position: relative;
-  flex-shrink: 0;
   box-shadow: var(--shadow);
 }
 
-/* =========================
-   IMÁGENES
-========================= */
+/* ===== IMAGEN ===== */
 .slide img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background: #fff;
   display: block;
 }
 
-.square-grid {
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  width: 100%;
-  height: 100%;
-}
-
-.square-grid img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Overlay sutil */
-.slide::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(33,24,50,0.08),
-    transparent 55%
-  );
-  pointer-events: none;
-}
-
-/* =========================
-   NUMERACIÓN
-========================= */
+/* ===== NUMERACIÓN ===== */
 .slide-number {
   position: absolute;
-  top: 18px;
-  right: 18px;
+  top: 16px;
+  right: 16px;
   font-size: 12px;
-  letter-spacing: 0.06em;
-  color: rgba(33, 24, 50, 0.75);
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(6px);
+  background: rgba(255,255,255,0.85);
   padding: 6px 12px;
   border-radius: 999px;
-  font-weight: 500;
-  z-index: 2;
 }
 
-/* =========================
-   CTA WHATSAPP COMPACTO
-========================= */
-.cta-container {
-  position: absolute;
-  bottom: 24px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  z-index: 3;
-  padding: 0 20px;
-}
-
+/* ===== CTA ===== */
 .cta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border-radius: 50px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  padding: 14px;
+  border-radius: 999px;
+  border: none;
   background: linear-gradient(135deg, #25D366, #1DA851);
   color: white;
-  font-size: 14px;
   font-weight: 600;
-  border: none;
-  cursor: pointer;
-  box-shadow: 
-    0 4px 20px rgba(37, 211, 102, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: var(--transition);
-  min-width: 0;
-  max-width: 280px;
-  margin: 0 auto;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 14px;
 }
 
-.cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 6px 24px rgba(37, 211, 102, 0.4),
-    0 3px 10px rgba(0, 0, 0, 0.15);
-}
-
-.cta:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.cta-icon {
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.cta-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* =========================
-   SWIPE HINT
-========================= */
+/* ===== SWIPE HINT ===== */
 .swipe-hint {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 16px;
-  color: rgba(33,24,50,0.6);
   background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(8px);
   padding: 10px 16px;
-  border-radius: 50px;
-  animation: swipeMove 2s infinite ease-in-out;
-  pointer-events: none;
-  z-index: 2;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 999px;
+  animation: swipe 1.8s infinite;
 }
 
-@keyframes swipeMove {
-  0%, 100% { 
-    transform: translate(-50%, -50%) translateX(0);
-    opacity: 0.8;
-  }
-  50% { 
-    transform: translate(-50%, -50%) translateX(15px);
-    opacity: 1;
-  }
-}
-
-/* =========================
-   PAGINATION DOTS
-========================= */
-.pagination {
-  position: absolute;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 8px;
-  z-index: 2;
-}
-
-.pagination-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.5);
-  border: 1px solid rgba(33,24,50,0.2);
-  transition: var(--transition);
-  cursor: pointer;
-}
-
-.pagination-dot.active {
-  background: var(--mint);
-  transform: scale(1.2);
-  border-color: var(--mint);
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-@media (max-width: 360px) {
-  .cta {
-    padding: 10px 20px;
-    font-size: 13px;
-    max-width: 260px;
-  }
-  
-  .cta-icon {
-    font-size: 16px;
-  }
-}
-
-@media (min-width: 768px) {
-  .cta {
-    padding: 14px 28px;
-    font-size: 15px;
-    max-width: 300px;
-  }
-  
-  .cta-icon {
-    font-size: 20px;
-  }
+@keyframes swipe {
+  0%,100% { transform: translate(-50%, -50%) translateX(0); }
+  50% { transform: translate(-50%, -50%) translateX(16px); }
 }
 </style>
 </head>
@@ -272,218 +109,90 @@ html, body {
 
 <section class="carousel-wrapper" id="root">
   <div class="carousel" id="carousel"></div>
-  <div class="pagination" id="pagination"></div>
 </section>
 
 <script>
+/* ===== CONFIG ===== */
 const images = [
   "https://i.imgur.com/kmIrUad.png",
-  "https://i.imgur.com/snudSiQ.png"
+  "https://i.imgur.com/snudSiQ.png",
+  "https://i.imgur.com/ohbz7BF.png"
 ];
+const WHATSAPP = "5521512563";
 
-const WHATSAPP = "5618371510";
 const carousel = document.getElementById("carousel");
 const root = document.getElementById("root");
-const pagination = document.getElementById("pagination");
 
-let currentSlide = 0;
-const totalSlides = images.length;
+let currentIndex = 0;
+let startX = 0;
+let currentX = 0;
+let isDragging = false;
 
-/* ===== Crear paginación ===== */
-images.forEach((_, index) => {
-  const dot = document.createElement("div");
-  dot.className = `pagination-dot ${index === 0 ? 'active' : ''}`;
-  dot.addEventListener('click', () => goToSlide(index));
-  pagination.appendChild(dot);
-});
-
-/* ===== Crear slides ===== */
-images.forEach((src, index) => {
+/* ===== CREAR SLIDES (SIN onload) ===== */
+images.forEach((src, i) => {
   const slide = document.createElement("div");
   slide.className = "slide";
-  slide.dataset.index = index;
 
-  const img = new Image();
+  const img = document.createElement("img");
   img.src = src;
   img.loading = "lazy";
-  img.alt = `Modelo ${index + 1}`;
 
-  img.onload = () => {
-    const isSquare = img.naturalWidth === img.naturalHeight;
-
-    if (isSquare) {
-      const grid = document.createElement("div");
-      grid.className = "square-grid";
-
-      const img1 = document.createElement("img");
-      const img2 = document.createElement("img");
-      img1.src = img2.src = src;
-      img1.alt = img2.alt = `Modelo ${index + 1}`;
-
-      grid.appendChild(img1);
-      grid.appendChild(img2);
-      slide.appendChild(grid);
-    } else {
-      slide.appendChild(img);
-    }
-  };
-
-  const label = `${index + 1}-A`;
-
-  const number = document.createElement("div");
-  number.className = "slide-number";
-  number.textContent = label;
-
-  const ctaContainer = document.createElement("div");
-  ctaContainer.className = "cta-container";
+  const num = document.createElement("div");
+  num.className = "slide-number";
+  num.textContent = `${i + 1}-A`;
 
   const cta = document.createElement("button");
   cta.className = "cta";
-  
-  const ctaIcon = document.createElement("span");
-  ctaIcon.className = "cta-icon";
-  ctaIcon.textContent = "💬";
-  
-  const ctaText = document.createElement("span");
-  ctaText.className = "cta-text";
-  ctaText.textContent = "Precio por WhatsApp";
-  
-  cta.appendChild(ctaIcon);
-  cta.appendChild(ctaText);
-
+  cta.textContent = "Precio por WhatsApp";
   cta.onclick = () => {
-    const message = encodeURIComponent(
+    const msg = encodeURIComponent(
 `Hola 👋
-Me gustó el modelo ${label} y deseo saber el precio.
+Me gustó el modelo ${i + 1}-A
 
-Imagen de referencia:
 ${src}`
     );
-
-    window.open(
-      `https://wa.me/${WHATSAPP}?text=${message}`,
-      "_blank"
-    );
+    window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, "_blank");
   };
 
   const hint = document.createElement("div");
   hint.className = "swipe-hint";
-  hint.innerHTML = `◀ Desliza ▶`;
+  hint.textContent = "◀ Desliza ▶";
 
-  ctaContainer.appendChild(cta);
-  slide.appendChild(number);
-  slide.appendChild(ctaContainer);
-  slide.appendChild(hint);
-
+  slide.append(img, num, cta, hint);
   carousel.appendChild(slide);
 });
 
-/* ===== Navegación a slide específico ===== */
-function goToSlide(index) {
-  currentSlide = index;
-  const slideWidth = document.querySelector('.slide').offsetWidth + 12;
-  carousel.style.transform = `translateX(-${currentSlide * slideWidth}px)`;
-  
-  // Actualizar paginación
-  document.querySelectorAll('.pagination-dot').forEach((dot, i) => {
-    dot.classList.toggle('active', i === currentSlide);
-  });
-  
-  // Remover hints después de la primera interacción
-  if (window.sessionStorage.getItem('hasInteracted') !== 'true') {
-    window.sessionStorage.setItem('hasInteracted', 'true');
-    document.querySelectorAll('.swipe-hint').forEach(h => h.remove());
-  }
-}
-
-/* =========================
-   SWIPE CON INERCIA
-========================= */
-let isDown = false;
-let startX = 0;
-let currentX = 0;
-let velocity = 0;
-let lastX = 0;
-let raf;
-let lastInteractionTime = 0;
-
-const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-
+/* ===== SWIPE SIMPLE + SNAP (ESTABLE) ===== */
 carousel.addEventListener("pointerdown", e => {
-  isDown = true;
-  startX = e.clientX - currentX;
-  lastX = e.clientX;
-  velocity = 0;
+  isDragging = true;
+  startX = e.clientX;
   carousel.setPointerCapture(e.pointerId);
-  lastInteractionTime = Date.now();
-
-  // Remover hints en la primera interacción
-  if (window.sessionStorage.getItem('hasInteracted') !== 'true') {
-    window.sessionStorage.setItem('hasInteracted', 'true');
-    document.querySelectorAll('.swipe-hint').forEach(h => h.remove());
-  }
-  
-  cancelAnimationFrame(raf);
+  document.querySelectorAll(".swipe-hint").forEach(h => h.remove());
 });
 
 carousel.addEventListener("pointermove", e => {
-  if (!isDown) return;
-  const x = e.clientX;
-  velocity = x - lastX;
-  lastX = x;
-  currentX = x - startX;
-  carousel.style.transition = 'none';
-  carousel.style.transform = `translateX(${currentX}px)`;
+  if (!isDragging) return;
+  currentX = e.clientX - startX;
+  carousel.style.transform =
+    `translateX(${ -currentIndex * window.innerWidth + currentX }px)`;
 });
 
 carousel.addEventListener("pointerup", () => {
-  isDown = false;
-  inertia();
+  isDragging = false;
+
+  if (Math.abs(currentX) > window.innerWidth * 0.2) {
+    currentIndex += currentX < 0 ? 1 : -1;
+  }
+
+  currentIndex = Math.max(0, Math.min(images.length - 1, currentIndex));
+  carousel.style.transition = "transform 0.3s ease";
+  carousel.style.transform =
+    `translateX(-${currentIndex * window.innerWidth}px)`;
+
+  setTimeout(() => carousel.style.transition = "", 300);
 });
 
-carousel.addEventListener("pointerleave", () => {
-  if (isDown) {
-    isDown = false;
-    inertia();
-  }
-});
-
-function inertia() {
-  velocity *= 0.92;
-  currentX += velocity;
-
-  const slideWidth = document.querySelector('.slide').offsetWidth + 12;
-  const maxScroll = 0;
-  const minScroll = -(carousel.scrollWidth - window.innerWidth);
-
-  // Snap al slide más cercano
-  const slideIndex = Math.round(-currentX / slideWidth);
-  const targetX = -Math.max(0, Math.min(slideIndex, totalSlides - 1)) * slideWidth;
-  
-  if (Math.abs(velocity) < 0.5 || Date.now() - lastInteractionTime > 100) {
-    carousel.style.transition = 'transform 0.3s ease-out';
-    currentX = targetX;
-    currentSlide = Math.round(-currentX / slideWidth);
-    
-    // Actualizar paginación
-    document.querySelectorAll('.pagination-dot').forEach((dot, i) => {
-      dot.classList.toggle('active', i === currentSlide);
-    });
-  }
-
-  currentX = clamp(currentX, minScroll, maxScroll);
-  carousel.style.transform = `translateX(${currentX}px)`;
-
-  sendHeight();
-
-  if (Math.abs(velocity) > 0.5 && Math.abs(currentX - targetX) > 5) {
-    raf = requestAnimationFrame(inertia);
-  }
-}
-
-/* =========================
-   AUTO ALTURA IFRAME
-========================= */
+/* ===== IFRAME HEIGHT ===== */
 function sendHeight() {
   window.parent.postMessage(
     { type: "carousel-height", height: root.scrollHeight },
@@ -493,9 +202,7 @@ function sendHeight() {
 
 window.addEventListener("load", sendHeight);
 window.addEventListener("resize", sendHeight);
-
-/* ===== Inicialización ===== */
-sendHeight();
 </script>
+
 </body>
 </html>
