@@ -18,7 +18,6 @@ html, body {
   padding: 0;
   background: var(--bg);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  /* 👇 NO ocultamos el overflow global */
 }
 
 * {
@@ -41,16 +40,15 @@ html, body {
   will-change: transform;
 }
 
+/* ===== SLIDE ===== */
 .slide {
   flex: 0 0 calc(100vw - 24px);
-  min-height: 100dvh; /* viewport dinámico correcto */
+  min-height: 100dvh;
   background: #fff;
   border-radius: 22px;
-  overflow: hidden;
   position: relative;
   box-shadow: var(--shadow);
-
-  /* 👇 espacio reservado para CTA */
+  overflow: hidden;
   padding-bottom: calc(90px + env(safe-area-inset-bottom));
 }
 
@@ -71,10 +69,9 @@ html, body {
   background: rgba(255,255,255,0.85);
   padding: 6px 12px;
   border-radius: 999px;
-  z-index: 2;
 }
 
-/* ===== CTA (STICKY INTERNO) ===== */
+/* ===== CTA ===== */
 .cta {
   position: absolute;
   left: 16px;
@@ -87,8 +84,6 @@ html, body {
   color: white;
   font-weight: 600;
   font-size: 14px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(37,211,102,0.45);
 }
 
 /* ===== SWIPE HINT ===== */
@@ -101,7 +96,6 @@ html, body {
   padding: 10px 16px;
   border-radius: 999px;
   animation: swipe 1.8s infinite;
-  z-index: 1;
 }
 
 @keyframes swipe {
@@ -113,7 +107,7 @@ html, body {
 
 <body>
 
-<section class="carousel-wrapper" id="root">
+<section class="carousel-wrapper">
   <div class="carousel" id="carousel"></div>
 </section>
 
@@ -132,6 +126,7 @@ let currentIndex = 0;
 let startX = 0;
 let currentX = 0;
 let isDragging = false;
+let slideWidth = 0;
 
 /* ===== CREAR SLIDES ===== */
 images.forEach((src, i) => {
@@ -167,7 +162,18 @@ ${src}`
   carousel.appendChild(slide);
 });
 
-/* ===== SWIPE SIMPLE + SNAP ===== */
+/* ===== CALCULAR ANCHO REAL ===== */
+function updateSlideWidth() {
+  const firstSlide = document.querySelector(".slide");
+  if (firstSlide) {
+    slideWidth = firstSlide.getBoundingClientRect().width + 12; // gap
+  }
+}
+
+window.addEventListener("resize", updateSlideWidth);
+updateSlideWidth();
+
+/* ===== SWIPE + SNAP ===== */
 carousel.addEventListener("pointerdown", e => {
   isDragging = true;
   startX = e.clientX;
@@ -179,20 +185,20 @@ carousel.addEventListener("pointermove", e => {
   if (!isDragging) return;
   currentX = e.clientX - startX;
   carousel.style.transform =
-    `translateX(${ -currentIndex * window.innerWidth + currentX }px)`;
+    `translateX(${ -currentIndex * slideWidth + currentX }px)`;
 });
 
 carousel.addEventListener("pointerup", () => {
   isDragging = false;
 
-  if (Math.abs(currentX) > window.innerWidth * 0.2) {
+  if (Math.abs(currentX) > slideWidth * 0.2) {
     currentIndex += currentX < 0 ? 1 : -1;
   }
 
   currentIndex = Math.max(0, Math.min(images.length - 1, currentIndex));
   carousel.style.transition = "transform 0.3s ease";
   carousel.style.transform =
-    `translateX(-${currentIndex * window.innerWidth}px)`;
+    `translateX(-${currentIndex * slideWidth}px)`;
 
   setTimeout(() => carousel.style.transition = "", 300);
 });
