@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>Carrusel Premium Iframe</title>
+
+<style>
+:root {
+  --mint: #5DD3B6;
+  --accent: #D61355;
+  --dark: #211832;
+  --bg: #ffffff;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  background: var(--bg);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================
+   CONTENEDOR IFRAME SAFE
+========================= */
+.carousel-wrapper {
+  width: 100vw;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 1rem 0 0.75rem;
+}
+
+/* =========================
+   CARRUSEL
+========================= */
+.carousel {
+  display: flex;
+  gap: 16px;
+  padding: 0 16px;
+  touch-action: pan-y;
+  will-change: transform;
+}
+
+.slide {
+  min-width: 82%;
+  background: #fff;
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow:
+    0 8px 32px rgba(93, 211, 182, 0.18),
+    0 2px 6px rgba(33, 24, 50, 0.05);
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* overlay premium */
+.slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(33,24,50,0.06),
+    transparent 45%
+  );
+  pointer-events: none;
+}
+
+/* =========================
+   DOTS
+========================= */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(33,24,50,0.25);
+  transition: all 0.35s ease;
+}
+
+.dot.active {
+  width: 18px;
+  border-radius: 10px;
+  background: var(--accent);
+}
+</style>
+</head>
+
+<body>
+
+<section class="carousel-wrapper" id="root">
+  <div class="carousel" id="carousel"></div>
+  <div class="dots" id="dots"></div>
+</section>
+
+<script>
+/* =====================================================
+   SOLO AGREGA / QUITA IMÁGENES AQUÍ 👇
+===================================================== */
+const images = [
+  "https://i.imgur.com/kmIrUad.png",
+  "https://i.imgur.com/snudSiQ.png"
+];
+/* ===================================================== */
+
+const carousel = document.getElementById("carousel");
+const dotsContainer = document.getElementById("dots");
+const root = document.getElementById("root");
+
+/* ===== Crear slides y dots ===== */
+images.forEach((src, i) => {
+  const slide = document.createElement("div");
+  slide.className = "slide";
+
+  const img = document.createElement("img");
+  img.src = src;
+  img.loading = "lazy";
+
+  slide.appendChild(img);
+  carousel.appendChild(slide);
+
+  const dot = document.createElement("div");
+  dot.className = "dot" + (i === 0 ? " active" : "");
+  dotsContainer.appendChild(dot);
+});
+
+const dots = [...document.querySelectorAll(".dot")];
+
+/* ===== Swipe con inercia ===== */
+let isDown = false;
+let startX = 0;
+let currentX = 0;
+let velocity = 0;
+let lastX = 0;
+let raf;
+
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+carousel.addEventListener("pointerdown", e => {
+  isDown = true;
+  startX = e.clientX - currentX;
+  lastX = e.clientX;
+  velocity = 0;
+  carousel.setPointerCapture(e.pointerId);
+  cancelAnimationFrame(raf);
+});
+
+carousel.addEventListener("pointermove", e => {
+  if (!isDown) return;
+  const x = e.clientX;
+  velocity = x - lastX;
+  lastX = x;
+  currentX = x - startX;
+  carousel.style.transform = `translateX(${currentX}px)`;
+});
+
+carousel.addEventListener("pointerup", () => {
+  isDown = false;
+  inertia();
+});
+
+carousel.addEventListener("pointerleave", () => {
+  if (isDown) {
+    isDown = false;
+    inertia();
+  }
+});
+
+function inertia() {
+  velocity *= 0.94;
+  currentX += velocity;
+
+  const maxScroll = 0;
+  const minScroll = -(carousel.scrollWidth - window.innerWidth + 16);
+
+  currentX = clamp(currentX, minScroll, maxScroll);
+  carousel.style.transform = `translateX(${currentX}px)`;
+
+  updateDots();
+  sendHeight();
+
+  if (Math.abs(velocity) > 0.5) {
+    raf = requestAnimationFrame(inertia);
+  }
+}
+
+/* ===== Sync dots ===== */
+function updateDots() {
+  const slideWidth =
+    carousel.querySelector(".slide").offsetWidth + 16;
+
+  let index = Math.round(Math.abs(currentX) / slideWidth);
+  index = clamp(index, 0, images.length - 1);
+
+  dots.forEach((d, i) =>
+    d.classList.toggle("active", i === index)
+  );
+}
+
+/* =====================================================
+   AUTO AJUSTE DE ALTURA PARA IFRAME (PRO)
+===================================================== */
+function sendHeight() {
+  const height = root.scrollHeight;
+  window.parent.postMessage(
+    { type: "carousel-height", height },
+    "*"
+  );
+}
+
+window.addEventListener("load", sendHeight);
+window.addEventListener("resize", sendHeight);
+</script>
+
+</body>
+</html>
