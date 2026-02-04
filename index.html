@@ -18,7 +18,7 @@ html, body {
   padding: 0;
   background: var(--bg);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow: hidden;
+  /* 👇 NO ocultamos el overflow global */
 }
 
 * {
@@ -43,12 +43,15 @@ html, body {
 
 .slide {
   flex: 0 0 calc(100vw - 24px);
-  min-height: 100vh; /* más estable que 100svh */
+  min-height: 100dvh; /* viewport dinámico correcto */
   background: #fff;
   border-radius: 22px;
   overflow: hidden;
   position: relative;
   box-shadow: var(--shadow);
+
+  /* 👇 espacio reservado para CTA */
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
 }
 
 /* ===== IMAGEN ===== */
@@ -68,15 +71,15 @@ html, body {
   background: rgba(255,255,255,0.85);
   padding: 6px 12px;
   border-radius: 999px;
+  z-index: 2;
 }
 
-/* ===== CTA ===== */
+/* ===== CTA (STICKY INTERNO) ===== */
 .cta {
   position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 40px);
+  left: 16px;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
   padding: 14px;
   border-radius: 999px;
   border: none;
@@ -84,6 +87,8 @@ html, body {
   color: white;
   font-weight: 600;
   font-size: 14px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(37,211,102,0.45);
 }
 
 /* ===== SWIPE HINT ===== */
@@ -96,6 +101,7 @@ html, body {
   padding: 10px 16px;
   border-radius: 999px;
   animation: swipe 1.8s infinite;
+  z-index: 1;
 }
 
 @keyframes swipe {
@@ -112,23 +118,20 @@ html, body {
 </section>
 
 <script>
-/* ===== CONFIG ===== */
 const images = [
   "https://i.imgur.com/kmIrUad.png",
-  "https://i.imgur.com/snudSiQ.png",
-  "https://i.imgur.com/ohbz7BF.png"
+  "https://i.imgur.com/snudSiQ.png"
 ];
-const WHATSAPP = "5521512563";
 
+const WHATSAPP = "5618371510";
 const carousel = document.getElementById("carousel");
-const root = document.getElementById("root");
 
 let currentIndex = 0;
 let startX = 0;
 let currentX = 0;
 let isDragging = false;
 
-/* ===== CREAR SLIDES (SIN onload) ===== */
+/* ===== CREAR SLIDES ===== */
 images.forEach((src, i) => {
   const slide = document.createElement("div");
   slide.className = "slide";
@@ -143,7 +146,7 @@ images.forEach((src, i) => {
 
   const cta = document.createElement("button");
   cta.className = "cta";
-  cta.textContent = "Precio por WhatsApp";
+  cta.textContent = "Me gustó este y deseo saber el precio";
   cta.onclick = () => {
     const msg = encodeURIComponent(
 `Hola 👋
@@ -162,7 +165,7 @@ ${src}`
   carousel.appendChild(slide);
 });
 
-/* ===== SWIPE SIMPLE + SNAP (ESTABLE) ===== */
+/* ===== SWIPE SIMPLE + SNAP ===== */
 carousel.addEventListener("pointerdown", e => {
   isDragging = true;
   startX = e.clientX;
@@ -191,17 +194,6 @@ carousel.addEventListener("pointerup", () => {
 
   setTimeout(() => carousel.style.transition = "", 300);
 });
-
-/* ===== IFRAME HEIGHT ===== */
-function sendHeight() {
-  window.parent.postMessage(
-    { type: "carousel-height", height: root.scrollHeight },
-    "*"
-  );
-}
-
-window.addEventListener("load", sendHeight);
-window.addEventListener("resize", sendHeight);
 </script>
 
 </body>
