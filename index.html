@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>Carrusel Premium Iframe</title>
+<title>Carrusel Fullscreen CTA</title>
 
 <style>
 :root {
@@ -18,7 +18,6 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: auto;
   overflow: hidden;
   background: var(--bg);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -30,13 +29,11 @@ html, body {
 }
 
 /* =========================
-   CONTENEDOR IFRAME SAFE
+   CONTENEDOR
 ========================= */
 .carousel-wrapper {
   width: 100vw;
-  max-width: 100%;
   overflow: hidden;
-  padding: 1rem 0 0.75rem;
 }
 
 /* =========================
@@ -44,66 +41,89 @@ html, body {
 ========================= */
 .carousel {
   display: flex;
-  gap: 16px;
-  padding: 0 16px;
+  gap: 12px;
+  padding: 0 12px;
   touch-action: pan-y;
   will-change: transform;
 }
 
 .slide {
-  min-width: 82%;
+  min-width: calc(100vw - 24px);
+  height: 100svh;
   background: #fff;
   border-radius: 22px;
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
   box-shadow:
-    0 8px 32px rgba(93, 211, 182, 0.18),
-    0 2px 6px rgba(33, 24, 50, 0.05);
+    0 10px 40px rgba(93, 211, 182, 0.18),
+    0 2px 6px rgba(33, 24, 50, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .slide img {
   width: 100%;
   height: 100%;
-  display: block;
-  object-fit: cover;
+  object-fit: contain;
+  background: #fff;
 }
 
-/* overlay premium */
+/* overlay sutil */
 .slide::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(33,24,50,0.06),
-    transparent 45%
+    rgba(33,24,50,0.08),
+    transparent 55%
   );
   pointer-events: none;
 }
 
 /* =========================
-   DOTS
+   NUMERACIÓN
 ========================= */
-.dots {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 14px;
+.slide-number {
+  position: absolute;
+  bottom: 70px;
+  right: 18px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: rgba(33, 24, 50, 0.75);
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(6px);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 500;
 }
 
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(33,24,50,0.25);
-  transition: all 0.35s ease;
+/* =========================
+   CTA WHATSAPP
+========================= */
+.cta {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 36px);
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--mint);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  text-align: center;
+  cursor: pointer;
+  box-shadow:
+    0 8px 28px rgba(93, 211, 182, 0.45);
 }
 
-.dot.active {
-  width: 18px;
-  border-radius: 10px;
-  background: var(--accent);
+.cta:active {
+  transform: translateX(-50%) scale(0.97);
 }
 </style>
 </head>
@@ -112,12 +132,11 @@ html, body {
 
 <section class="carousel-wrapper" id="root">
   <div class="carousel" id="carousel"></div>
-  <div class="dots" id="dots"></div>
 </section>
 
 <script>
 /* =====================================================
-   SOLO AGREGA / QUITA IMÁGENES AQUÍ 👇
+   AGREGA / QUITA IMÁGENES AQUÍ 👇
 ===================================================== */
 const images = [
   "https://i.imgur.com/kmIrUad.png",
@@ -125,12 +144,12 @@ const images = [
 ];
 /* ===================================================== */
 
+const WHATSAPP = "5618371510";
 const carousel = document.getElementById("carousel");
-const dotsContainer = document.getElementById("dots");
 const root = document.getElementById("root");
 
-/* ===== Crear slides y dots ===== */
-images.forEach((src, i) => {
+/* ===== Crear slides ===== */
+images.forEach((src, index) => {
   const slide = document.createElement("div");
   slide.className = "slide";
 
@@ -138,17 +157,39 @@ images.forEach((src, i) => {
   img.src = src;
   img.loading = "lazy";
 
-  slide.appendChild(img);
-  carousel.appendChild(slide);
+  const number = document.createElement("div");
+  number.className = "slide-number";
+  const label = `${index + 1}-A`;
+  number.textContent = label;
 
-  const dot = document.createElement("div");
-  dot.className = "dot" + (i === 0 ? " active" : "");
-  dotsContainer.appendChild(dot);
+  const cta = document.createElement("button");
+  cta.className = "cta";
+  cta.textContent = "Me gustó este y deseo saber el precio";
+
+  cta.onclick = () => {
+    const message = encodeURIComponent(
+`Hola 👋
+Me gustó el modelo ${label} y deseo saber el precio.
+
+Imagen de referencia:
+${src}`
+    );
+
+    window.open(
+      `https://wa.me/${WHATSAPP}?text=${message}`,
+      "_blank"
+    );
+  };
+
+  slide.appendChild(img);
+  slide.appendChild(number);
+  slide.appendChild(cta);
+  carousel.appendChild(slide);
 });
 
-const dots = [...document.querySelectorAll(".dot")];
-
-/* ===== Swipe con inercia ===== */
+/* =========================
+   SWIPE CON INERCIA
+========================= */
 let isDown = false;
 let startX = 0;
 let currentX = 0;
@@ -189,16 +230,15 @@ carousel.addEventListener("pointerleave", () => {
 });
 
 function inertia() {
-  velocity *= 0.94;
+  velocity *= 0.92;
   currentX += velocity;
 
   const maxScroll = 0;
-  const minScroll = -(carousel.scrollWidth - window.innerWidth + 16);
+  const minScroll = -(carousel.scrollWidth - window.innerWidth);
 
   currentX = clamp(currentX, minScroll, maxScroll);
   carousel.style.transform = `translateX(${currentX}px)`;
 
-  updateDots();
   sendHeight();
 
   if (Math.abs(velocity) > 0.5) {
@@ -206,26 +246,12 @@ function inertia() {
   }
 }
 
-/* ===== Sync dots ===== */
-function updateDots() {
-  const slideWidth =
-    carousel.querySelector(".slide").offsetWidth + 16;
-
-  let index = Math.round(Math.abs(currentX) / slideWidth);
-  index = clamp(index, 0, images.length - 1);
-
-  dots.forEach((d, i) =>
-    d.classList.toggle("active", i === index)
-  );
-}
-
-/* =====================================================
-   AUTO AJUSTE DE ALTURA PARA IFRAME (PRO)
-===================================================== */
+/* =========================
+   AUTO ALTURA IFRAME
+========================= */
 function sendHeight() {
-  const height = root.scrollHeight;
   window.parent.postMessage(
-    { type: "carousel-height", height },
+    { type: "carousel-height", height: root.scrollHeight },
     "*"
   );
 }
